@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 import os
+import json
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -125,3 +126,10 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_ROOT = os.path.join(STATIC_ROOT, 'media')
 MEDIA_URL = '/media/'
+
+# NLU_API_KEY
+with open('../server/djangobackend/secrets.json') as f:
+    secrets = json.load(f)
+
+NLU_API_KEY = secrets['NLU_API_KEY']
+NLU_URL = secrets['NLU_URL']
