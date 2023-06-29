@@ -40,9 +40,9 @@ def login_request(request):
             login(request, user)
             return redirect('djangoapp:index')
         else:
-            return render(request, 'djangoapp/user_login.html', context)
+            return render(request, 'djangoapp/index.html', context)
     else:
-        return render(request, 'djangoapp/user_login.html', context)
+        return render(request, 'djangoapp/index.html', context)
 
 # Create a `logout_request` view to handle sign out request
 def logout_request(request):
@@ -81,24 +81,19 @@ def registration_request(request):
 def get_dealerships(request):
     if request.method == "GET":
         url = "https://us-south.functions.appdomain.cloud/api/v1/web/c21f65db-458f-4470-9b40-335efdfada2d/api/dealership"
-        # Get dealers from the URL
         dealerships = get_dealers_from_cf(url)
-        # Concat all dealer's short name
-        dealer_names = ' '.join([dealer.short_name for dealer in dealerships])
-        # Return a list of dealer short name
-        return HttpResponse(dealer_names)
+        context = {'dealership_list': dealerships}
+        return render(request, 'djangoapp/index.html', context)
 
 
 # Create a `get_dealer_details` view to render the reviews of a dealer
 def get_dealer_details(request, dealer_id):
     if request.method == "GET":
+        dealer_name = request.GET.get('name')
         url = "https://us-south.functions.appdomain.cloud/api/v1/web/c21f65db-458f-4470-9b40-335efdfada2d/api/review"
-        # Get dealers from the URL
         reviews = get_dealer_reviews_from_cf(url, dealer_id)
-        # Concat all dealer's short name
-        review_names = ' '.join([f"{review.review} (Sentiment: {review.sentiment})" for review in reviews])
-        # Return a list of review short name
-        return HttpResponse(review_names)
+        context = {'reviews_list': reviews, 'dealer_name': dealer_name, 'dealer_id': dealer_id}
+        return render(request, 'djangoapp/dealer_details.html', context)
 
 # Create a `add_review` view to submit a review
 @login_required
@@ -115,4 +110,7 @@ def add_review(request, dealer_id):
         url = "<URL for review-post cloud function>"
         response = post_request(url, json_payload, dealerId=dealer_id)
         return HttpResponse(response)
-
+    elif request.method== "GET":
+        dealer_name = request.GET.get('name')
+        context = {'dealer_id': dealer_id, 'dealer_name': dealer_name}
+        return render(request, 'djangoapp/add_review.html', context)
