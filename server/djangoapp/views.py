@@ -90,6 +90,11 @@ def get_dealerships(request):
 def get_dealer_details(request, dealer_id):
     if request.method == "GET":
         dealer_name = request.GET.get('name')
+        if dealer_name == None:
+            dealer_name = request.session.get('dealer_name')
+        else:
+            request.session['dealer_name'] = dealer_name
+            
         url = "https://us-south.functions.appdomain.cloud/api/v1/web/c21f65db-458f-4470-9b40-335efdfada2d/api/review"
         reviews = get_dealer_reviews_from_cf(url, dealer_id)
         context = {'reviews_list': reviews, 'dealer_name': dealer_name, 'dealer_id': dealer_id}
@@ -100,10 +105,14 @@ def get_dealer_details(request, dealer_id):
 def add_review(request, dealer_id):
     if request.method== "GET":
         dealer_name = request.GET.get('name')
+        if dealer_name == None:
+            dealer_name = request.session.get('dealer_name')
+
         cars = CarModel.objects.filter(dealer_id=dealer_id)
         context = {'cars': cars, 'dealer_id': dealer_id, 'dealer_name': dealer_name}
         return render(request, 'djangoapp/add_review.html', context)
     elif request.method == "POST":
+        dealer_name = request.GET.get('name')
         form = request.POST
 
         review = {
@@ -118,12 +127,14 @@ def add_review(request, dealer_id):
             review["purchase_date"] = datetime.strptime(form.get("purchase_date"), "%m/%d/%Y").isoformat() 
             review["car_make"] = car.car_make.name
             review["car_model"] = car.name
-            review["car_year"] = car.year.strftime("%Y")
+            review["car_year"] = car.year
+            # review["car_year"] = car.year.strftime("%Y")
 
         json_payload = {'review': review}
         url = 'https://us-south.functions.appdomain.cloud/api/v1/web/c21f65db-458f-4470-9b40-335efdfada2d/api/add-review'
         response = post_request(url, json_payload)
         print(response)
-        # return 'ok'
+
         return redirect('djangoapp:dealer_details', dealer_id=dealer_id)
+
     

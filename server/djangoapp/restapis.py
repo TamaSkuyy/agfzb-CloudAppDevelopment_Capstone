@@ -62,17 +62,26 @@ def get_dealer_reviews_from_cf(url, dealer_id):
     json_result = get_request(url, dealerId=dealer_id)
     if json_result:
         # Get the row list in JSON as reviews
-        reviews = json_result["rows"]
-        # For each review object
-        for review in reviews:
-            # Get its content in `doc` object
-            review_doc = review
-            # Create a DealerReview object with values in `doc` object
-            review_obj = DealerReview(dealership=review_doc["dealership"], name=review_doc["name"], purchase=review_doc["purchase"],
-                                review=review_doc["review"], purchase_date=review_doc["purchase_date"], car_make=review_doc["car_make"],
-                                car_model=review_doc["car_model"], car_year=review_doc["car_year"], id=review_doc["id"])
-            review_obj.sentiment = analyze_review_sentiments(review_obj.review)
-            results.append(review_obj)
+        if "rows" in json_result:
+            reviews = json_result["rows"]
+            # For each review object
+            for review in reviews:
+                # Get its content in `doc` object
+                review_doc = review
+                # Create a DealerReview object with values in `doc` object
+                review_obj = DealerReview(
+                    dealership = review_doc["dealership"] if "dealership" in review_doc else None,
+                    name = review_doc["name"] if "name" in review_doc else "",
+                    purchase = review_doc["purchase"] if "purchase" in review_doc else None,
+                    review = review_doc["review"] if "review" in review_doc else "",
+                    purchase_date = review_doc["purchase_date"] if "purchase_date" in review_doc else None,
+                    car_make = review_doc["car_make"] if "car_make" in review_doc else "",
+                    car_model = review_doc["car_model"] if "car_model" in review_doc else "",
+                    car_year = review_doc["car_year"] if "car_year" in review_doc else None,
+                    id = review_doc["id"] if "id" in review_doc else None
+                )
+                review_obj.sentiment = analyze_review_sentiments(review_obj.review)
+                results.append(review_obj)
 
     return results
 

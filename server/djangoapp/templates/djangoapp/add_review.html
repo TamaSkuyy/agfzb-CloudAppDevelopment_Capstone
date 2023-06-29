@@ -14,15 +14,15 @@
         <div class="m-3">
             <h2>Add a review about <strong>{{dealer_name}}</strong></h2>
     
-            <form action="{% url 'djangoapp:add_review' dealer_id %}" method="post">
+            <form action="{% url 'djangoapp:add_review' dealer_id %}?name={{dealer_name|urlencode}}" method="post">
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="content">Enter the review content:</label>
                     <textarea class="form-control" id="content" name="content" rows="2" required></textarea>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="purchasecheck" id="purchasecheck">
-                    <label class="form-check-label" for="purchasecheck">Has purchased the car from {{dealer_name}}? <small style="color: #777;">(select purchased car information below if checked)</small></label>
+                    <input class="form-check-input" type="checkbox" name="purchase_check" id="purchase_check">
+                    <label class="form-check-label" for="purchase_check">Has purchased the car from {{dealer.full_name}}? <small style="color: #777;">(select purchased car information below if checked)</small></label>
                 </div>
                 <div class="form-group">
                     <label for="car"><strong>Select your car (model-make-year):</strong></label>
@@ -33,8 +33,8 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="purchasedate"><strong>Select Your Purchase Date:</strong></label>
-                    <input class="date-own form-control" type="text" name="purchasedate" id="purchasedate">
+                    <label for="purchase_date"><strong>Select Your Purchase Date:</strong></label>
+                    <input class="date-own form-control" type="text" name="purchase_date" id="purchase_date">
                 </div>
                 <input type="submit" value="Submit">
             </form>
